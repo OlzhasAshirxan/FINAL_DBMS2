@@ -1,0 +1,231 @@
+-- FINAL PROJECT
+-- ASHIRKHAN OLZHAS 180103213
+-- BEISENBAYEVA SAULE 180103081
+
+-- TASK 3
+-- FOR TOTAL
+CREATE OR REPLACE PROCEDURE find_gpa(id_student in Course_selections_2016.STUD_ID%TYPE,
+TOTAL OUT NUMBER ,
+TOTAL_SUBJ OUT NUMBER 
+) IS
+GPA NUMBER;
+BEGIN
+SELECT SUM(QIYMET_YUZ), COUNT(QIYMET_YUZ) INTO TOTAL, TOTAL_SUBJ from Course_selections_2016
+WHERE STUD_ID = id_student;
+GPA := total/total_subj;
+IF GPA < 100 AND GPA > 95 THEN DBMS_OUTPUT.PUT_LINE('THE GPA IS: 4    STUDENT ID: ' || id_student);
+ELSIF GPA < 94 AND GPA > 90 THEN DBMS_OUTPUT.PUT_LINE('THE GPA IS: 3.67    STUDENT ID: ' || id_student);
+ELSIF GPA < 89 AND GPA > 85 THEN DBMS_OUTPUT.PUT_LINE('THE GPA IS: 3.33    STUDENT ID: ' || id_student);
+ELSIF GPA < 84 AND GPA > 80 THEN DBMS_OUTPUT.PUT_LINE('THE GPA IS: 3.00    STUDENT ID: ' || id_student);
+ELSIF GPA < 79 AND GPA > 75 THEN DBMS_OUTPUT.PUT_LINE('THE GPA IS: 2.67    STUDENT ID: ' || id_student);
+ELSIF GPA < 74 AND GPA > 70 THEN DBMS_OUTPUT.PUT_LINE('THE GPA IS: 2.33    STUDENT ID: ' || id_student);
+ELSIF GPA < 69 AND GPA > 65 THEN DBMS_OUTPUT.PUT_LINE('THE GPA IS: 2.00    STUDENT ID: ' || id_student);
+ELSIF GPA < 64 AND GPA > 60 THEN DBMS_OUTPUT.PUT_LINE('THE GPA IS: 1.67    STUDENT ID: ' || id_student);
+ELSIF GPA < 59 AND GPA > 55 THEN DBMS_OUTPUT.PUT_LINE('THE GPA IS: 1.33    STUDENT ID: ' || id_student);
+ELSIF GPA < 54 AND GPA > 50 THEN DBMS_OUTPUT.PUT_LINE('THE GPA IS: 1.00    STUDENT ID: ' || id_student);
+ELSIF GPA < 50 THEN DBMS_OUTPUT.PUT_LINE('THE GPA IS: 0    STUDENT ID: ' || id_student);
+END IF;
+END find_gpa;
+
+SET SERVEROUTPUT ON;
+DECLARE 
+a_total NUMBER;
+a_total_subject NUMBER;
+BEGIN
+find_gpa('1BE62388007249890ADF37743AB9D9F27ADCD932', a_total, a_total_subject);
+END;
+
+
+-- FOR SEMESTER
+CREATE OR REPLACE PROCEDURE find_gpa(id_student in Course_selections_2016.STUD_ID%TYPE,
+the_term in Course_selections_2016.TERM_Course%TYPE,
+TOTAL OUT NUMBER ,
+TOTAL_SUBJ OUT NUMBER 
+) IS
+GPA NUMBER;
+BEGIN
+SELECT SUM(QIYMET_YUZ), COUNT(QIYMET_YUZ) INTO TOTAL, TOTAL_SUBJ from Course_selections_2016
+WHERE STUD_ID = id_student AND the_term = TERM_Course;
+GPA := total/total_subj ;
+IF GPA <= 100 AND GPA > 95 THEN DBMS_OUTPUT.PUT_LINE('THE GPA IS: 4   STUDENT ID: ' || id_student);
+ELSIF GPA < 94 AND GPA > 90 THEN DBMS_OUTPUT.PUT_LINE('THE GPA IS: 3.67    STUDENT ID: ' || id_student);
+ELSIF GPA < 89 AND GPA > 85 THEN DBMS_OUTPUT.PUT_LINE('THE GPA IS: 3.33    STUDENT ID: ' || id_student);
+ELSIF GPA < 84 AND GPA > 80 THEN DBMS_OUTPUT.PUT_LINE('THE GPA IS: 3.00    STUDENT ID: ' || id_student);
+ELSIF GPA < 79 AND GPA > 75 THEN DBMS_OUTPUT.PUT_LINE('THE GPA IS: 2.67    STUDENT ID: ' || id_student);
+ELSIF GPA < 74 AND GPA > 70 THEN DBMS_OUTPUT.PUT_LINE('THE GPA IS: 2.33    STUDENT ID: ' || id_student);
+ELSIF GPA < 69 AND GPA > 65 THEN DBMS_OUTPUT.PUT_LINE('THE GPA IS: 2.00    STUDENT ID: ' || id_student);
+ELSIF GPA < 64 AND GPA > 60 THEN DBMS_OUTPUT.PUT_LINE('THE GPA IS: 1.67    STUDENT ID: ' || id_student);
+ELSIF GPA < 59 AND GPA > 55 THEN DBMS_OUTPUT.PUT_LINE('THE GPA IS: 1.33    STUDENT ID: ' || id_student);
+ELSIF GPA < 54 AND GPA > 50 THEN DBMS_OUTPUT.PUT_LINE('THE GPA IS: 1.00    STUDENT ID: ' || id_student);
+ELSIF GPA < 50 THEN DBMS_OUTPUT.PUT_LINE('THE GPA IS: 0     STUDENT ID: ' || id_student);
+END IF;
+END find_gpa;
+
+SET SERVEROUTPUT ON;
+DECLARE 
+a_total NUMBER;
+a_total_subject NUMBER;
+BEGIN
+find_gpa('C143C7E436CE8A05805280E99BD8BEA407A16897', 1, a_total, a_total_subject);
+END;
+
+
+
+-- TASK 4
+DECLARE
+id_student Course_selections_2019.STUD_ID%TYPE;
+
+CURSOR find_didnt_register IS
+	SELECT STUD_ID FROM Course_selections_2019
+	WHERE QIYMET_HERF = 'IP';
+v_record find_didnt_register%ROWTYPE;
+BEGIN
+OPEN find_didnt_register;
+FETCH find_didnt_register INTO v_record;
+LOOP
+DBMS_OUTPUT.PUT_LINE(v.record.id_student);
+FETCH find_didnt_register INTO id_student;
+EXIT WHEN find_didnt_register%NOTFOUND;
+END LOOP;
+CLOSE find_didnt_register;
+END;
+
+
+
+-- TASK 5
+SET SERVEROUTPUT ON;
+DECLARE 
+id_student Course_selections_2016.STUD_ID%TYPE;
+the_term Course_selections_2016.TERM_COURSE%TYPE;
+total_retakes Course_selections_2016.QIYMET_HERF%TYPE;
+spent NUMBER;
+CURSOR get_retakes IS
+	SELECT QIYMET_HERF FROM Course_selections_2016
+	WHERE STUD_ID = id_student AND TERM_COURSE = the_term;
+BEGIN
+id_student := '565A4A71691E3CFEC725BD0B36B150DF29CD68BC';
+the_term := 1;
+spent := 0;
+OPEN get_retakes;
+LOOP
+FETCH get_retakes INTO total_retakes;
+IF total_retakes = 'F' THEN spent := spent + 75000;
+END IF;
+END LOOP;
+DBMS_OUTPUT.PUT_LINE(spent);
+CLOSE get_retakes;
+END;
+
+
+
+
+-- TASK 6 
+CREATE OR REPLACE FUNCTION find_total_hours(
+id_teacher IN Course_sections.EMP_ID%TYPE,
+the_term IN Course_sections.TERM_Course%TYPE,
+the_year IN Course_sections.YEAR_Course%TYPE,
+the_type OUT Course_sections.Type_Course%TYPE
+) RETURN NUMBER IS
+TOTAL_SUBJ NUMBER := 0;
+BEGIN 
+SELECT Type_course INTO the_type FROM Course_sections
+WHERE EMP_ID = id_teacher AND TERM_Course = the_term AND Year_Course = the_year;
+IF the_type = 'N' OR the_type = 'L' THEN TOTAL_SUBJ := TOTAL_SUBJ + 30;
+ELSIF the_type = 'P' THEN TOTAL_SUBJ := TOTAL_SUBJ + 15;
+END IF;
+RETURN TOTAL_SUBJ;
+END find_total_hours;
+
+DECLARE 
+a_type Course_sections.TYPE_Course%TYPE;
+BEGIN
+find_total_hours(10081, 1, 2015, a_type);
+END;
+
+
+
+
+-- TASK 9
+SET SERVEROUTPUT ON;
+DECLARE 
+v_year Course_selections_2016.YEAR_Course%TYPE;
+id_student Course_selections_2016.STUD_ID%TYPE;
+total NUMBER;
+CURSOR get_subjects IS
+	SELECT COUNT(DERS_KOD)
+	FROM Course_selections_2016
+	WHERE STUD_ID = id_student AND v_year = YEAR_COURSE;
+BEGIN
+v_year := 2016;
+id_student := '1BE62388007249890ADF37743AB9D9F27ADCD932';
+OPEN get_subjects;
+FETCH get_subjects INTO total;
+DBMS_OUTPUT.PUT_LINE('Subjects: ' || total || '  Credits: ' || total*3);
+CLOSE get_subjects;
+END;
+
+
+
+
+-- TASK 10
+CREATE OR REPLACE FUNCTION get_avg(
+id_num in NUMBER
+) RETURN NUMBER IS
+the_average NUMBER;
+BEGIN
+SELECT AVG(id_num) INTO the_average FROM COURSE_SELECTIONS_2016;
+RETURN (the_average);
+END get_avg;
+
+
+SET SERVEROUTPUT ON;
+DECLARE 
+id_student Course_selections_2016.DERS_KOD%TYPE;
+the_grade Course_selections_2016.QIYMET_YUZ%TYPE;
+id_subject Course_selections_2016.DERS_KOD%TYPE;
+id_teacher Course_selections_2016.PRACTICE%TYPE;
+CURSOR get_students IS
+	SELECT STUD_ID, QIYMET_YUZ FROM Course_selections_2016
+	WHERE DERS_KOD = id_subject AND PRACTICE = id_teacher;
+BEGIN
+id_subject := 'LAW 421';
+id_teacher := 5840;
+
+OPEN get_students;
+LOOP
+FETCH get_students INTO id_student, the_grade;
+IF the_grade > get_avg(the_grade) THEN DBMS_OUTPUT.PUT_LINE(id_student);
+END IF;
+END LOOP;
+CLOSE get_students;
+END;
+
+
+
+-- TASK 13
+DECLARE
+total NUMBER;
+CURSOR get_all_retakes IS
+	SELECT COUNT(QIYMET_HERF)
+	FROM Course_selections_2016
+	WHERE QIYMET_YUZ < 50;
+BEGIN
+OPEN get_all_retakes;
+FETCH get_all_retakes INTO total;
+DBMS_OUTPUT.PUT_LINE(total);
+CLOSE get_all_retakes;
+END;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
